@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Jquery Mobile Splitview</title>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../jquery-mobile/jquery.mobile.css" />
+		<link rel="stylesheet" href="../src/jquery.mobile.splitview.css" />
+		<!--link rel="stylesheet"  href="../src/jquery.mobile.grids.collapsible.css" /-->
+		<script type="text/javascript" src="../vendor/jquery-1.7.1.js"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
+		<script type="text/javascript" src="../src/jquery.mobile.splitview.js"></script>
+		<script type="text/javascript" src="../jquery-mobile/jquery.mobile.js"></script>
+		<script type="text/javascript" src="appjs/func.js"></script>
+		<script type="text/javascript" src="appjs/vars.js"></script>
+		<script>
+			
+			function initialize() {
+				var UPRM = new google.maps.LatLng(18.209438, -67.140543);
+				
+				var mapOptions = {
+					zoom : 17,
+					minZoom : 16,
+					maxZoom : 18,
+					center : UPRM,
+					mapTypeId : google.maps.MapTypeId.ROADMAP,
+					disableDefaultUI : true
+				};
+				
+				map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+				
+				// TROLLEY STOP MARKERS -------------------------------------------------------------------------------
+				var busstop = 'images/icons-simple/busstop.png';
+				
+				stop_array = [
+					{	key : "pala", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.205942,-67.136433),
+						title : "Palacio",
+						icon: busstop
+					})},
+					
+					{	key: "fisi", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.210868,-67.139643),
+						title : "Puente Fisica",
+						icon: busstop
+					})},
+				
+					{	key: "bibl", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.211787,-67.14196),
+						title : "Biblioteca",
+						icon: busstop
+					})},
+				
+					{ 	key: "pati", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.211283,-67.140823),
+						title : "Patio Central",
+						icon: busstop
+					})},
+				
+					{	key: "admi", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.216771,-67.143049),
+						title : "Administracion de Empresas",
+						icon: busstop
+					})},
+				
+					{	key: "civi", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.21458,-67.139772),
+						title : "Ingenieria Civil",
+						icon: busstop
+					})},
+				
+					{	key: "stef", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.20968,-67.139021),
+						title : "Stefani",
+						icon: busstop
+					})},
+				
+					{	key: "port", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.208957,-67.140322),
+						title : "Portico",
+						icon: busstop
+					})},
+				
+					{	key: "barc", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.207543,-67.139935),
+						title : "Barcelona",
+						icon: busstop
+					})},
+				
+					{	key: "deca", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.208648,-67.141432),
+						title : "Decanato de Estudiantes",
+						icon: busstop
+					})},
+				
+					{	key: "cent", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.209935,-67.141472),
+						title : "Centro de Estudiantes",
+						icon: busstop
+					})},
+				
+					{	key: "entr", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.211064,-67.144672),
+						title : "Entrada Principal",
+						icon: busstop
+					})},
+				
+					{	key: "darl", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.205683,-67.146185),
+						title : "Darlington",
+						icon: busstop
+					})},
+				
+					{	key: "gimn", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.212119,-67.143776),
+						title : "Gimnasio",
+						icon: busstop
+					})},
+				
+					{	key: "finc", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.215461,-67.146341),
+						title : "Finca Alzamora",
+						icon: busstop
+					})},
+				
+					{	key: "terr", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.215375,-67.14802),
+						title : "Parque Terrace",
+						icon: busstop
+					})},
+				
+					{	key: "pine", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.210638,-67.143591),
+						title : "Pinero",
+						icon: busstop
+					})},
+				
+					{	key: "atle", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.217306,-67.144844),
+						title : "Residencia de Atletas",
+						icon: busstop
+					})},
+				
+					{	key: "biol", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.211762,-67.138246),
+						title : "Biologia",
+						icon: busstop
+					})},
+				
+					{	key: "zool", value: new google.maps.Marker({
+						position : new google.maps.LatLng(18.215813,-67.133396),
+						title : "Zoologico",
+						icon: busstop
+					})}
+					];
+				
+				$.each(stop_array, function(stop) {
+					stop_array[stop].value.setMap(map);
+				});
+				
+				// ROUTE POLYLINES ------------------------------------------------------------------------------------
+				
+				route_array = [
+					{	key: "route1", value:	new google.maps.Polyline({
+												path : Palacio,
+												strokeColor : '#FF0000',
+												strokeOpacity : 0.6,
+												strokeWeight : 10,
+												map : map
+					})},
+										
+				
+					{	key: "route2", value:	new google.maps.Polyline({
+												visible : false,
+												path : Zoologico,
+												strokeColor : '#00FFFF',
+												strokeOpacity : 0.6,
+												strokeWeight : 10,
+												map : map
+					})},
+					
+					{	key: "route3", value: 	new google.maps.Polyline({
+												visible : false,
+												path : Interno,
+												strokeColor : '#FFFF00',
+												strokeOpacity : 0.6,
+												strokeWeight : 10,
+												map : map
+					})},
+					
+					{	key: "route4", value:	new google.maps.Polyline({
+												visible : false,
+												path : Terrace,
+												strokeColor : '#FF00FF',
+												strokeOpacity : 0.6,
+												strokeWeight : 10,
+												map : map
+					})},
+										
+					{	key: "route5", value:	new google.maps.Polyline({
+												visible : false,
+												path : Darlington,
+												strokeColor : '#00FF00',
+												strokeOpacity : 0.6,
+												strokeWeight : 10,
+												map : map
+					})}
+					];
+			}
+			google.maps.event.addDomListener(window, "load", initialize);
+
+		</script>
+		<style>
+			#content {
+				padding: 0;
+				position: absolute !important;
+				top: 40px !important;
+				right: 0;
+				bottom: 40px !important;
+				left: 0 !important;
+			}
+			
+		</style>
+
+		<body>
+
+			<div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
+
+				<div data-role="page" id="main" data-hash="false" data-theme="a">
+
+					<div data-role="header" data-position="fixed">
+						<h1>Menu</h1>
+					</div>
+
+					<div data-role="popup" id="login-popup" style="max-width:450px;">
+						<div data-role="header" data-position="fixed">
+							<h3>Login</h3>
+						</div>
+
+						<fieldset data-role="controlgroup" data-inset="true" style="padding: 40px 20px 20px 20px;">
+							<form id="login-form">
+								<label for="card-holder-name">Username:</label>
+								<input type="text" name="card-holder-name" id="card-holder-name" data-mini="true" maxlength="40"/>
+								<label for="card-num">Password:</label>
+								<input type="text" name="card-num" id="card-num" data-mini="true"/>
+							</form>
+						</fieldset>
+
+						<a href="index.html" data-role="button" data-rel="back" data-inline="true" data-inline="true">Cancel</a>
+						<a href="#" data-role="button" data-theme="b" data-transition="fade" data-inline="true">Log In</a>
+					</div>
+
+					<div data-role="popup" id="api-popup" style="max-width:450px;">
+						<div data-role="header" data-position="fixed">
+							<h3>Request API Key</h3>
+						</div>
+
+						<fieldset data-role="controlgroup" data-inset="true" style="padding: 40px 20px 20px 20px;">
+							<form id="login-form">
+								<label for="api-name">Name:</label>
+								<input type="text" name="api-name" id="api-name" data-mini="true" maxlength="40"/>
+								<label for="api-email">Email:</label>
+								<input type="text" name="api-email" id="api-email" data-mini="true" maxlength="40"/>
+								<div>
+									<label for="purpose">Purpose:</label>
+									<textarea id="purpose" name="purpose" rows="3"></textarea>
+								</div>
+							</form>
+						</fieldset>
+
+						<a href="index.html" data-role="button" data-rel="back" data-inline="true" data-inline="true">Cancel</a>
+						<a href="#" data-role="button" data-theme="b" data-transition="fade" data-inline="true">Log In</a>
+					</div>
+
+					<div data-role="content">
+						<ul data-role="listview">
+							<li>
+								Bus Arrival Times
+								<ul data-theme="a">
+									<li>
+										<label for="select-stop" class="ui-hidden-accessible"></label>
+										<select name="select-stop" id="select-stop">
+											<option value="" data-placeholder="true">Select Bus Stop</option>
+											<option value="admi">Administracion de Empresas</option>
+											<option value="barc">Barcelona</option>
+											<option value="bibl">Biblioteca</option>
+											<option value="biol">Biologia</option>
+											<option value="cent">Centro de Estudiantes</option>
+											<option value="darl">Darlington</option>
+											<option value="deca">Decanato de Estudiantes</option>
+											<option value="entr">Entrada Principal</option>
+											<option value="finc">Finca Alzamora</option>
+											<option value="fisi">Fisica</option>
+											<option value="gimn">Gimnasio</option>
+											<option value="civi">Ingenieria Civil</option>
+											<option value="pala">Palacio</option>
+											<option value="terr">Parque Terrace</option>
+											<option value="pati">Patio Central</option>
+											<option value="pine">Pinero</option>
+											<option value="port">Portico</option>
+											<option value="atle">Residencia de Atletas</option><!--registrador-->
+											<option value="stef">Stefani</option>
+											<option value="zool">Zoologico</option>
+										</select>
+										<label for="select-route" class="ui-hidden-accessible">Select Route</label>
+										<select name="select-route" id="select-route">
+											<option value="" data-placeholder="true">Select Route</option>
+											<option value="1">Palacio</option>
+											<option value="2">Zoologico</option>
+											<option value="3">Interno</option>
+											<option value="4">Terrace</option>
+											<option value="5">Darlington</option>
+										</select>
+									</li>
+								</ul>
+							</li>
+							<li>
+								Map Options
+								<ul data-theme="a">
+									<li>
+										Toggle Routes
+										<ul data-theme="a">
+											<form id="route-form">
+												<div data-role="listview" data-inset="false" style="padding: 5px 25px 5px 25px; ">
+													<fieldset data-role="controlgroup" data-inset="true" style="position: relative; margin-bottom: -20px;">
+														<input type="radio" name="route-choice" id="route-1" value="route1" checked="checked" />
+														<label for="route-1">Palacio</label>
+														<input type="radio" name="route-choice" id="route-2" value="route2"/>
+														<label for="route-2">Zoologico</label>
+														<input type="radio" name="route-choice" id="route-3" value="route3"/>
+														<label for="route-3">Interno</label>
+														<input type="radio" name="route-choice" id="route-4" value="route4"/>
+														<label for="route-4">Terrace</label>
+														<input type="radio" name="route-choice" id="route-5" value="route5"/>
+														<label for="route-5">Darlington</label>
+													</fieldset>
+												</div>
+											</form>
+										</ul>
+									</li>
+									<li data-icon="false">
+										<a href='#'>Reset Map View</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								Service Info
+								<ul data-theme="a">
+									<li>
+										Palacio
+										<ul data-theme="a" style='font-size:12pt;'>
+											<li>
+												Monday thru Thursday:
+												<br />
+												<span style="font-weight: normal;">6:30am - 9:45pm</span>
+											</li>
+											<li>
+												Fridays:
+												<br />
+												<span style="font-weight: normal;">6:30am - 6:30pm</span>
+											</li>
+										</ul>
+									</li>
+									<li>
+										Zoologico
+										<ul data-theme="a" style='font-size:12pt;'>
+											<li>
+												Monday thru Friday:
+												<br />
+												<span style="font-weight: normal;">6:30am - 4:45pm</span>
+											</li>
+										</ul>
+									</li>
+									<li>
+										Interno
+										<ul data-theme="a" style='font-size:12pt;'>
+											<li>
+												Monday thru Thursday:
+												<br />
+												<span style="font-weight: normal;">6:30am - 9:45pm</span>
+											</li>
+											<li>
+												Fridays:
+												<br />
+												<span style="font-weight: normal;">6:30am - 6:30pm</span>
+											</li>
+										</ul>
+									</li>
+									<li>
+										Terrace
+										<ul data-theme="a" style='font-size:12pt;'>
+											<li>
+												Monday thru Thursday:
+												<br />
+												<span style="font-weight: normal;">6:30am - 9:45pm</span>
+											</li>
+											<li>
+												Fridays:
+												<br />
+												<span style="font-weight: normal;">6:30am - 6:30pm</span>
+											</li>
+										</ul>
+									</li>
+									<li>
+										Darlington
+										<ul data-theme="a" style='font-size:12pt;'>
+											<li>
+												Monday thru Friday:
+												<br />
+												<span style="font-weight: normal;">6:30am - 5:45pm</span>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href='#api-popup' data-rel="popup">Request API Key</a>
+							</li>
+							<li>
+								<a href="#login-popup" data-rel="popup">Admin Login</a>
+							</li>
+						</ul>
+					</div><!-- /content -->
+
+					<div data-role="footer" data-position="fixed" data-id="ew-footer">
+						<div data-role="navbar">
+							<ul>
+								<li>
+									<a href="#" data-transition="slideup">Exit</a>
+								</li>
+							</ul>
+						</div><!-- /navbar -->
+						<h2 class="ui-splitview-hidden">TechTrinkets Inc. 2014</h2>
+					</div><!-- /footer -->
+				</div><!-- /page -->
+			</div><!-- panel menu -->
+
+			<div data-role="panel" data-id="main">
+				<div data-role="page" id="aboutsv">
+
+					<div data-role="header">
+						<h1>UPRM TrolleyTracker</h1>
+					</div><!-- /header -->
+
+					<div data-role="popup" id="api-popup" data-theme="a" style="width:350px;">
+						<div data-role="header" data-position="fixed">
+							<h3>Request API Key</h3>
+						</div>
+
+						<fieldset data-role="controlgroup" data-inset="true" style="padding: 55px 20px 20px 20px;">
+							<form id="login-form">
+								<label for="card-holder-name">Name:</label>
+								<input type="text" name="card-holder-name" id="card-holder-name" data-mini="true" maxlength="30"/>
+								<label for="card-num">Email:</label>
+								<input type="text" name="card-num" id="card-num" data-mini="true" maxlength="19"/>
+								<div data-role="fieldcontain">
+									<label for="textarea">Purpose:</label>
+									<textarea cols="8" rows="18" name="textarea" id="textarea"></textarea>
+								</div>
+							</form>
+						</fieldset>
+						<center>
+							<a href="index.html" data-role="button" data-rel="back" data-inline="true" data-inline="true" style="width: 44%;">Cancel</a>
+							<a href="#" data-role="button" data-theme="b" data-transition="fade" data-inline="true" style="width: 44%;">Submit</a>
+						</center>
+					</div>
+
+					<!-------------------------------------------------------MAP-AREA-------------------------------------------------------------------->
+					<div data-role="content" id="content" style="width:100%; height:100%; padding:0;">
+						<!--decorative red bar below header-->
+						<div data-theme="b" style="width: 100%; height: 9px; position: top;
+							background: -webkit-linear-gradient(#3B0000, red); background: -o-linear-gradient(#3B0000, red); 
+							background: -moz-linear-gradient(#3B0000, red); background: linear-gradient(#3B0000, red);">
+						</div>
+						<div id="map-canvas" style="width:100%; height:100%;"></div>
+					</div><!-- /content -->
+
+					<div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
+						<div data-role="navbar">
+							<ul>
+								<li>
+									<a href="#main" class="ui-btn-active" data-transition="slideup">Main</a>
+								</li>
+								<li>
+									<a href="#demo" data-transition="slideup">Demos</a>
+								</li>
+							</ul>
+						</div><!-- /navbar -->
+						<h2>Engineworks &copy CS8</h2>
+					</div><!-- /footer -->
+				</div><!-- /page -->
+			</div><!-- panel main -->
+			
+			<div data-role="page" id="admin-home" data-hash="false" data-theme="a">
+				<div data-role="header" data-theme="a" data-position="fixed">
+			    	<a href="#" data-role="button" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Menu</a>
+			    	<h4>UPRM TrolleyTracker</h4>
+			    	<!--a href="#" data-role="button" data-icon="bars">Info</a-->
+				</div>
+				<!--list of products being sold-->
+				<div data-role="content">
+					<!--Manage API keys button-->
+					<!--Manage Announcements button-->
+				</div>
+			</div>
+		</body>
+</html>
