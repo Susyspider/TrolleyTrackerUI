@@ -5,7 +5,33 @@
 		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
 		<link rel="stylesheet" href="../jquery-mobile/jquery.mobile.css" />
 		<link rel="stylesheet" href="../src/jquery.mobile.splitview.css" />
+		<link rel="stylesheet" href="jquery-ui-1.10.4/jquery-ui-1.10.4/jquery-1.10.2.js" />
+		<!--link rel="stylesheet" href="themes/f.min.css" /-->
+		<!--link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" /-->
 		<!--link rel="stylesheet"  href="../src/jquery.mobile.grids.collapsible.css" /-->
+		<style>
+			#admin-buttons a {
+			  	padding: 10px;
+			  }
+			.odd {
+			  background-color : #EEEEEE;
+			  color : black;
+			  text-align : center;
+			  height : 30px;
+			  padding-top : 5px;
+			  font-weight: bold;
+			  font-size: 16px;
+			}
+			.even {
+			  background-color : #CCCCCC;
+			  color : black;
+			  text-align : center;
+			  height : 30px;
+			  padding-top : 5px;
+			  font-weight:bold;
+			  font-size: 16px;
+			}
+		</style>
 		<script type="text/javascript" src="../vendor/jquery-1.7.1.js"></script>
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
 		<script type="text/javascript" src="../src/jquery.mobile.splitview.js"></script>
@@ -160,7 +186,7 @@
 				// ROUTE POLYLINES ------------------------------------------------------------------------------------
 				
 				route_array = [
-					{	key: "route1", value:	new google.maps.Polyline({
+					{	key: "route1", title: "Palacio", value:	new google.maps.Polyline({
 												path : Palacio,
 												strokeColor : '#FF0000',
 												strokeOpacity : 0.6,
@@ -169,7 +195,7 @@
 					})},
 										
 				
-					{	key: "route2", value:	new google.maps.Polyline({
+					{	key: "route2", title: "Zoologico", value: new google.maps.Polyline({
 												visible : false,
 												path : Zoologico,
 												strokeColor : '#00FFFF',
@@ -178,7 +204,7 @@
 												map : map
 					})},
 					
-					{	key: "route3", value: 	new google.maps.Polyline({
+					{	key: "route3", title: "Interno", value:	new google.maps.Polyline({
 												visible : false,
 												path : Interno,
 												strokeColor : '#FFFF00',
@@ -187,7 +213,7 @@
 												map : map
 					})},
 					
-					{	key: "route4", value:	new google.maps.Polyline({
+					{	key: "route4", title: "Terrace", value:	new google.maps.Polyline({
 												visible : false,
 												path : Terrace,
 												strokeColor : '#FF00FF',
@@ -196,7 +222,7 @@
 												map : map
 					})},
 										
-					{	key: "route5", value:	new google.maps.Polyline({
+					{	key: "route5", title: "Darlington", value:	new google.maps.Polyline({
 												visible : false,
 												path : Darlington,
 												strokeColor : '#00FF00',
@@ -246,7 +272,7 @@
 						</fieldset>
 
 						<a href="index.html" data-role="button" data-rel="back" data-inline="true" data-inline="true">Cancel</a>
-						<a href="#" data-role="button" data-theme="b" data-transition="fade" data-inline="true">Log In</a>
+						<a href="#admin-home" data-role="button" data-theme="b" data-transition="fade" data-inline="true">Log In</a>
 					</div>
 
 					<div data-role="popup" id="api-popup" style="max-width:450px;">
@@ -304,13 +330,18 @@
 										<label for="select-route" class="ui-hidden-accessible">Select Route</label>
 										<select name="select-route" id="select-route">
 											<option value="" data-placeholder="true">Select Route</option>
-											<option value="1">Palacio</option>
-											<option value="2">Zoologico</option>
-											<option value="3">Interno</option>
-											<option value="4">Terrace</option>
-											<option value="5">Darlington</option>
+											<option value="route1">Palacio</option>
+											<option value="route2">Zoologico</option>
+											<option value="route3">Interno</option>
+											<option value="route4">Terrace</option>
+											<option value="route5">Darlington</option>
 										</select>
+										<br/>
+										<div id="calculate-eta" data-role="button" data-theme="e">Calculate</div>
 									</li>
+									<li id="eta-stop"></li>
+									<li id="eta-route"></li>
+									<li id="eta-eta"></li>
 								</ul>
 							</li>
 							<li>
@@ -338,7 +369,7 @@
 										</ul>
 									</li>
 									<li data-icon="false">
-										<a href='#'>Reset Map View</a>
+										<a id="reset-map-view">Reset Map View</a>
 									</li>
 								</ul>
 							</li>
@@ -467,7 +498,7 @@
 					<!-------------------------------------------------------MAP-AREA-------------------------------------------------------------------->
 					<div data-role="content" id="content" style="width:100%; height:100%; padding:0;">
 						<!--decorative red bar below header-->
-						<div data-theme="b" style="width: 100%; height: 9px; position: top;
+						<div id="eta-bar" data-theme="b" style="width: 100%; height: 9px; position: top; margin-top: 4px;
 							background: -webkit-linear-gradient(#3B0000, red); background: -o-linear-gradient(#3B0000, red); 
 							background: -moz-linear-gradient(#3B0000, red); background: linear-gradient(#3B0000, red);">
 						</div>
@@ -488,19 +519,101 @@
 						<h2>Engineworks &copy CS8</h2>
 					</div><!-- /footer -->
 				</div><!-- /page -->
+				
+				<div id="admin-home" data-role="page">
+					<div data-role="header" data-theme="a" data-position="fixed">
+						<a href="index.html" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Back</a>
+						<h2>Admin Dashboard</h2>
+					</div>
+					<div data-role="content">
+						<div id="admin-buttons" data-role="controlgroup" data-inset="true">
+							<a href='#api-keys' data-role="button" data-icon="lock" data-iconpos="left">Manage API Keys</a>
+							<a href="#announcements" data-role="button" data-icon="info" data-iconpos="left">Manage Announcements</a>
+							<a href="#service-hours" data-role="button" data-icon="star" data-iconpos="left">Manage Service Hours</a>
+						</div>
+					</div>
+				</div>
+				
+				<div id="api-keys" data-role="page">
+					<div data-role="header" data-theme="a" data-position="fixed">
+						<a href="index.html" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Back</a>
+						<h2>Admin Dashboard</h2>
+					</div>
+					<div data-role="content">
+						<h3>API Keys</h3>
+					    <div class="ui-grid-b ui-corner-all ui-shadow" data-inset="true" style="padding: 5px;">
+					      <div class="ui-block-a odd">Username1</div>
+					      <div class="ui-block-b odd">Key1</div>
+					      <div class="ui-block-c odd">Status1</div>
+					      <div class="ui-block-a even">Username2</div>
+					      <div class="ui-block-b even">Key2</div>
+					      <div class="ui-block-c even">Status2</div>
+					      <div class="ui-block-a odd">Username3</div>
+					      <div class="ui-block-b odd">Key3</div>
+					      <div class="ui-block-c odd">Status3</div>
+					      <div class="ui-block-a even">Username4</div>
+					      <div class="ui-block-b even">Key4</div>
+					      <div class="ui-block-c even">Status4</div>
+					      <div class="ui-block-a odd">Username5</div>
+					      <div class="ui-block-b odd">Key5</div>
+					      <div class="ui-block-c odd">Status5</div>
+					    </div>
+					</div>
+				</div>
+				
+				<div id="announcements" data-role="page">
+					<div data-role="header" data-theme="a" data-position="fixed">
+						<a href="index.html" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Back</a>
+						<h2>Admin Dashboard</h2>
+					</div>
+					<div data-role="content">
+						<h3>Announcements</h3>
+					    <div class="ui-grid-b ui-corner-all ui-shadow" data-inset="true" style="padding: 5px;">
+					      <div class="ui-block-a odd">Username1</div>
+					      <div class="ui-block-b odd">Key1</div>
+					      <div class="ui-block-c odd">Status1</div>
+					      <div class="ui-block-a even">Username2</div>
+					      <div class="ui-block-b even">Key2</div>
+					      <div class="ui-block-c even">Status2</div>
+					      <div class="ui-block-a odd">Username3</div>
+					      <div class="ui-block-b odd">Key3</div>
+					      <div class="ui-block-c odd">Status3</div>
+					      <div class="ui-block-a even">Username4</div>
+					      <div class="ui-block-b even">Key4</div>
+					      <div class="ui-block-c even">Status4</div>
+					      <div class="ui-block-a odd">Username5</div>
+					      <div class="ui-block-b odd">Key5</div>
+					      <div class="ui-block-c odd">Status5</div>
+					    </div>
+					</div>
+				</div>
+				
+				<div id="service-hours" data-role="page">
+					<div data-role="header" data-theme="a" data-position="fixed">
+						<a href="index.html" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Back</a>
+						<h2>Admin Dashboard</h2>
+					</div>
+					<div data-role="content">
+						<h3>Service Hours</h3>
+					    <div class="ui-grid-b ui-corner-all ui-shadow" data-inset="true" style="padding: 5px;">
+					      <div class="ui-block-a odd">Username1</div>
+					      <div class="ui-block-b odd">Key1</div>
+					      <div class="ui-block-c odd">Status1</div>
+					      <div class="ui-block-a even">Username2</div>
+					      <div class="ui-block-b even">Key2</div>
+					      <div class="ui-block-c even">Status2</div>
+					      <div class="ui-block-a odd">Username3</div>
+					      <div class="ui-block-b odd">Key3</div>
+					      <div class="ui-block-c odd">Status3</div>
+					      <div class="ui-block-a even">Username4</div>
+					      <div class="ui-block-b even">Key4</div>
+					      <div class="ui-block-c even">Status4</div>
+					      <div class="ui-block-a odd">Username5</div>
+					      <div class="ui-block-b odd">Key5</div>
+					      <div class="ui-block-c odd">Status5</div>
+					    </div>
+					</div>
+				</div>
 			</div><!-- panel main -->
-			
-			<div data-role="page" id="admin-home" data-hash="false" data-theme="a">
-				<div data-role="header" data-theme="a" data-position="fixed">
-			    	<a href="#" data-role="button" data-rel="back" data-icon="back" data-mini="true" data-inline="true">Menu</a>
-			    	<h4>UPRM TrolleyTracker</h4>
-			    	<!--a href="#" data-role="button" data-icon="bars">Info</a-->
-				</div>
-				<!--list of products being sold-->
-				<div data-role="content">
-					<!--Manage API keys button-->
-					<!--Manage Announcements button-->
-				</div>
-			</div>
 		</body>
 </html>
