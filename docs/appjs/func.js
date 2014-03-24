@@ -187,31 +187,29 @@ function centerOnPath(path,map) {
 function ShowRoute(the_route){
 	var title;
 	$.each(route_array, function(route) {
-			route_array[route].value.setVisible(false);
-			if(route_array[route].key === the_route){
-				title = route_array[route].title;
-				the_route = route_array[route].value;
-			}
-		});
-		the_route.setVisible(true);
-		centerOnPath(the_route.getPath(),map);
-		return {"poly":the_route,"title":title};
+		route_array[route].value.setVisible(false);
+		if(route_array[route].key === the_route){
+			title = route_array[route].title;
+			the_route = route_array[route].value;
+		}
+	});
+	the_route.setVisible(true);
+	centerOnPath(the_route.getPath(),map);
+	return {"poly":the_route,"title":title};
 }
 
-//turns off animation of all markers
 function ShowStop(the_stop){
 	$.each(stop_array, function(stop) {
-			stop_array[stop].value.setAnimation(null);
-			if(stop_array[stop].key === the_stop){
-				the_stop = stop_array[stop].value;
-			}
-		});
-		the_stop.setAnimation(google.maps.Animation.BOUNCE);
-		map.setCenter(the_stop.getPosition());
-		return the_stop;
+		stop_array[stop].value.setAnimation(null);
+		if(stop_array[stop].key === the_stop){
+			the_stop = stop_array[stop].value;
+		}
+	});
+	the_stop.setAnimation(google.maps.Animation.BOUNCE);
+	map.setCenter(the_stop.getPosition());
+	return the_stop;
 }
 
-//TODO: turn off all trolleys on all routes,turn on trolleys on route
 $(document).ready(function() {
     $('input:radio[name="route-choice"]').change(
     function(){
@@ -224,6 +222,23 @@ $(document).on('click', "#reset-map-view", function() {
   	map.setZoom(17);
 });
 
+$(document).on('click', "#eta-clear", function() {
+	$( "#eta-stop" ).empty();
+	$( "#eta-route" ).empty();
+	$( "#eta-eta" ).empty();
+	
+	$( "#eta-stop" ).css({	'display': 'none' });
+	$( "#eta-route" ).css({ 'display': 'none' });
+	$( "#eta-eta" ).css({	'display': 'none' });
+	$( "#eta-clear" ).css({	'display': 'none' });
+	
+	$( "#eta-bar" ).empty();
+	$('#eta-bar').css({
+		'height': '6px',
+	});
+	//bring route select and stop select to default
+});
+
 $(document).on('click', "#calculate-eta", function() {
 	var the_stop = $('#select-stop').val();
 	var the_route = $('#select-route').val();
@@ -233,8 +248,17 @@ $(document).on('click', "#calculate-eta", function() {
 		the_stop = ShowStop(the_stop);
 		$( "#eta-stop" ).html("Stop: "+the_stop.getTitle());
 		$( "#eta-route" ).html("Route: "+the_route.title);
-		$( "#eta-eta" ).html("ETA: 10min" );
-		$( "#eta-bar" ).html("<center>ETA: 10min</center>" );
+		$( "#eta-eta" ).html("ETA: 10 min");
+		$( "#eta-stop" ).css({	'display': 'block' });
+		$( "#eta-route" ).css({ 'display': 'block' });
+		$( "#eta-eta" ).css({	'display': 'block' });
+		$( "#eta-clear" ).css({	'display': 'block' });
+		var html = "<div class=ui-grid-b>";
+		html +=   "<div class=ui-block-a><center>Stop: "+the_stop.getTitle()+"</center></div>";
+		html +=   "<div class=ui-block-b><center>Route: "+the_route.title+"</center></div>";
+		html +=   "<div class=ui-block-c><center>ETA: 10min</center></div>";
+		html += "</div>";
+		$( "#eta-bar" ).html(html);
 	    $('#eta-bar').css({
 	        'height': '22px',
 	        'color': '#FFFFFF'
