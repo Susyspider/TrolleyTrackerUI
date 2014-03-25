@@ -1,5 +1,4 @@
 //TODO: fix mobile view
-//TODO: test trolley movement simulator
 //TODO: consider alternatives to splitview? Maybe accordion-style options
 
 function getDistanceAcrossPath(slatlng,tlatlng,rpath){
@@ -38,26 +37,6 @@ function getDistanceAcrossPath(slatlng,tlatlng,rpath){
 	return {"len1":length1,"len2":length2};
 }
 
-function markerDropListener(marker,path,map){
-	var shadow = new google.maps.Marker({
-		position : marker.getPosition(),
-		visible : false
-	  });
-	  
-	shadow.setMap(map);
-	  
-	google.maps.event.addListener(marker, "dragend", function(event) { 
-	  var lat = event.latLng.lat(); 
-	  var lng = event.latLng.lng();
-	  var latlng = new google.maps.LatLng(lat,lng);
-	  marker.setPosition(latlng);
-	  
-	  var res = closestPointOnPath(latlng,path);
-	  shadow.setPosition(res.coord);
-	  shadow.setVisible(true);
-	});
-}
-
 function closestPointOnPath(latlng,path){
 	var coord = path[0];
 	var theindex;
@@ -71,34 +50,7 @@ function closestPointOnPath(latlng,path){
 	}
 	
 	var dist = google.maps.geometry.spherical.computeDistanceBetween(latlng,coord);
-	/*
-	if(dist <= 6){
-		console.log("Uber awesome. Distance between markers is: "+dist+" m");
-	} else if (dist <= 20){
-		console.log("Cool. Distance between markers is: "+dist+" m");
-	  } else {
-		console.log("Warning, draggable marker is far away from path: "+dist+" m");
-	    }*/
-	
 	return {"coord":coord,"dist":dist,"index":theindex};
-}
-
-function addMarkerListener(map,marker){
-	google.maps.event.addListener(marker, 'click', function() {
-        map.panTo(marker.getPosition());
-    });
-}
-
-function animateSymbol(polyline) {
-	var count = 0;
-	var step = 64;
-	window.setInterval(function() {
-		count = (count + 1) % (step*100);
-
-		var icons = polyline.get('icons');
-		icons[0].offset = (count / step) + '%';
-		polyline.set('icons', icons);
-	}, 20);
 }
 
 function animateMarker(tmarker,tmarker_path,rpolyline,slatlng) {
@@ -187,7 +139,6 @@ function centerOnPath(path,map) {
 	map.fitBounds(bounds);
 }
 
-//turns off all routes, turns on selected route and adjusts map bounds to fit route
 function ShowRoute(the_route){
 	var title;
 	$.each(route_array, function(route) {
@@ -210,60 +161,290 @@ function ShowStop(the_stop){
 		}
 	});
 	the_stop.setAnimation(google.maps.Animation.BOUNCE);
+	setTimeout(function () {
+	    the_stop.setAnimation(null);
+	}, 2300);
 	map.setCenter(the_stop.getPosition());
 	return the_stop;
 }
 
-$(document).ready(function() {
-    $('input:radio[name="route-choice"]').change(
-    function(){
-	   	ShowRoute($(this).val());
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Init Functions ---------------------------------------------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function initGeolocation(){
+	var geocoords;
+	var browserSupportFlag =  new Boolean();
+
+	if(navigator.geolocation) {
+		browserSupportFlag = true;
+		navigator.geolocation.getCurrentPosition(function(position) {
+		geocoords = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+		map.setCenter(geocoords);
+		var closest_stop;
+		var min_dist;
+		var curr_dist;
+		$.each(stop_array, function(stop) {
+			curr_dist = google.maps.geometry.spherical.computeDistanceBetween(stop_array[stop].value.getPosition(),geocoords);
+			if(stop == 0){
+				closest_stop = stop_array[stop];
+				min_dist = curr_dist;
+			}
+			else {
+				if(curr_dist < min_dist){
+					min_dist = curr_dist;
+					closest_stop = stop_array[stop];
+				}
+			}
+		});
+		
+		(new google.maps.Marker({position : geocoords})).setMap(map);
+		alert("Your location seems to be "+Math.round(min_dist)+"m away from the "+closest_stop.value.getTitle()+" stop.");
+		
+		}, function() {
+	      handleNoGeolocation(browserSupportFlag);
+	    });
+	}
+	else {
+	    browserSupportFlag = false;
+	    handleNoGeolocation(browserSupportFlag);
+	}
+	
+	function handleNoGeolocation(errorFlag) {
+		if (errorFlag == true) {
+			alert("Geolocation service failed.");
+		} else {
+			alert("Your browser doesn't support geolocation. Sad :(");
+		}
+	}
+}
+
+function initRoutes(){
+	route_array = [
+		{	key: "route1", title: "Palacio", 
+			stops: ["pala","barc","port","stef","pati"],
+			value:	new google.maps.Polyline({
+			path : Palacio,
+			strokeColor : '#FF0000',
+			strokeOpacity : 0.6,
+			strokeWeight : 10,
+			map : map
+		})},					
+	
+		{	key: "route2", title: "Zoologico",
+			stops: ["zool","biol","civi","bibl","fisi"],
+			value: new google.maps.Polyline({
+			visible : false,
+			path : Zoologico,
+			strokeColor : '#00FFFF',
+			strokeOpacity : 0.6,
+			strokeWeight : 10,
+			map : map
+		})},
+		
+		{	key: "route3", title: "Interno",
+			stops: ["atle","admi","bibl","fisi","cent","pine"],
+			value:	new google.maps.Polyline({
+			visible : false,
+			path : Interno,
+			strokeColor : '#FFFF00',
+			strokeOpacity : 0.6,
+			strokeWeight : 10,
+			map : map
+		})},
+		
+		{	key: "route4", title: "Terrace",
+			stops: ["terr","finc","admi","pati","fisi","cent"],
+			value:	new google.maps.Polyline({
+			visible : false,
+			path : Terrace,
+			strokeColor : '#FF00FF',
+			strokeOpacity : 0.6,
+			strokeWeight : 10,
+			map : map
+		})},
+							
+		{	key: "route5", title: "Darlington",
+			stops: ["darl","entr","gimn","bibl"],
+			value:	new google.maps.Polyline({
+			visible : false,
+			path : Darlington,
+			strokeColor : '#00FF00',
+			strokeOpacity : 0.6,
+			strokeWeight : 10,
+			map : map
+		})}
+	];
+}
+
+function initStopMarkers(){
+	var busstop = 'images/icons-simple/busstop.png';
+				
+	stop_array = [
+		{	key : "pala", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.205942,-67.136433),
+			title : "Palacio",
+			icon: busstop
+		})},
+		
+		{	key: "fisi", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.210868,-67.139643),
+			title : "Puente Fisica",
+			icon: busstop
+		})},
+	
+		{	key: "bibl", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.211787,-67.14196),
+			title : "Biblioteca",
+			icon: busstop
+		})},
+	
+		{ 	key: "pati", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.211283,-67.140823),
+			title : "Patio Central",
+			icon: busstop
+		})},
+	
+		{	key: "admi", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.216771,-67.143049),
+			title : "Administracion de Empresas",
+			icon: busstop
+		})},
+	
+		{	key: "civi", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.21458,-67.139772),
+			title : "Ingenieria Civil",
+			icon: busstop
+		})},
+	
+		{	key: "stef", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.20968,-67.139021),
+			title : "Stefani",
+			icon: busstop
+		})},
+	
+		{	key: "port", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.208957,-67.140322),
+			title : "Portico",
+			icon: busstop
+		})},
+	
+		{	key: "barc", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.207543,-67.139935),
+			title : "Barcelona",
+			icon: busstop
+		})},
+	
+		{	key: "deca", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.208648,-67.141432),
+			title : "Decanato de Estudiantes",
+			icon: busstop
+		})},
+	
+		{	key: "cent", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.209935,-67.141472),
+			title : "Centro de Estudiantes",
+			icon: busstop
+		})},
+	
+		{	key: "entr", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.211064,-67.144672),
+			title : "Entrada Principal",
+			icon: busstop
+		})},
+	
+		{	key: "darl", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.205683,-67.146185),
+			title : "Darlington",
+			icon: busstop
+		})},
+	
+		{	key: "gimn", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.212119,-67.143776),
+			title : "Gimnasio",
+			icon: busstop
+		})},
+	
+		{	key: "finc", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.215461,-67.146341),
+			title : "Finca Alzamora",
+			icon: busstop
+		})},
+	
+		{	key: "terr", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.215375,-67.14802),
+			title : "Parque Terrace",
+			icon: busstop
+		})},
+	
+		{	key: "pine", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.210638,-67.143591),
+			title : "Pinero",
+			icon: busstop
+		})},
+	
+		{	key: "atle", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.217306,-67.144844),
+			title : "Residencia de Atletas",
+			icon: busstop
+		})},
+	
+		{	key: "biol", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.211762,-67.138246),
+			title : "Biologia",
+			icon: busstop
+		})},
+	
+		{	key: "zool", value: new google.maps.Marker({
+			position : new google.maps.LatLng(18.215813,-67.133396),
+			title : "Zoologico",
+			icon: busstop
+		})}
+	];
+		
+	$.each(stop_array, function(stop) {
+		stop_array[stop].value.setMap(map);
 	});
-});
+}
+
+function initSimulatorStuff(){
+	var bus = 'images/icons-simple/bus.png';
+
+	var route3_trolley = new google.maps.Marker({
+		position : interno_trolley[0],
+		title : "interno_trolley",
+		icon: bus
+	});
+	
+	route3_trolley.setMap(map);
+	animateMarker(route3_trolley,interno_trolley,route_array[2].value);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Event Listeners --------------------------------------------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(document).on('click', "#reset-map-view", function() {
     map.setCenter(new google.maps.LatLng(18.209438, -67.140543));
   	map.setZoom(17);
 });
 
-//TODO: stop animations on all markers
 $(document).on('click', "#eta-clear", function() {
-	$( "#eta-stop" ).empty();
+	$( "#eta-stop"  ).empty();
 	$( "#eta-route" ).empty();
-	$( "#eta-eta" ).empty();
+	$( "#eta-eta"   ).empty();
 	
-	$( "#eta-stop" ).css({	'display': 'none' });
+	$( "#eta-stop"  ).css({	'display': 'none' });
 	$( "#eta-route" ).css({ 'display': 'none' });
-	$( "#eta-eta" ).css({	'display': 'none' });
+	$( "#eta-eta"   ).css({	'display': 'none' });
 	$( "#eta-clear" ).css({	'display': 'none' });
 	
-	$( "#eta-bar" ).empty();
-	$('#eta-bar').css({
+	$( "#eta-bar"   ).empty();
+	$( "#eta-bar"   ).css({
 		'height': '6px',
 	});
 });
 
-$(document).on('change', "#select-route", function() {
-	var the_route = $('#select-route').val();
-	var the_stops;
-	$('#select-stop').empty();
-	$.each(route_array, function(route) {
-		if(route_array[route].key === the_route){
-			the_stops = route_array[route].stops;
-			$.each(stop_array, function(stop) {
-				$.each(the_stops, function(the_stop) {
-					if(stop_array[stop].key == the_stops[the_stop]){
-						$('#select-stop').append("<option value='"+stop_array[stop].key+"'>"+stop_array[stop].value.getTitle()+"</option>");
-					}
-				});
-			});
-		}
-	});
-	$('#select-stop').prepend('<option value="" data-placeholder="true">Select Bus Stop</option>');
-	$("#select-stop").selectmenu("refresh");
-});
-
-//TODO: set timeout for marker animation
 $(document).on('click', "#calculate-eta", function() {
 	var the_stop = $('#select-stop').val();
 	var the_route = $('#select-route').val();
@@ -293,3 +474,80 @@ $(document).on('click', "#calculate-eta", function() {
 		alert("Please select both a route and a stop.");
 	}
 });
+
+$(document).on('change', "#follow-trolley", function() {
+	if($('#follow-trolley').is(':checked')){
+		$(document).on('change', "#follow-trolley", function() {
+		});
+	}
+});
+
+$(document).on('change', "#route-form", function() {
+    $('input:radio[name="route-choice"]').change(
+    function(){
+	   	ShowRoute($(this).val());
+	});
+});
+
+$(document).on('change', "#select-route", function() {
+	var the_route = $('#select-route').val();
+	var the_stops;
+	$('#select-stop').empty();
+	$.each(route_array, function(route) {
+		if(route_array[route].key === the_route){
+			the_stops = route_array[route].stops;
+			$.each(stop_array, function(stop) {
+				$.each(the_stops, function(the_stop) {
+					if(stop_array[stop].key == the_stops[the_stop]){
+						$('#select-stop').append("<option value='"+stop_array[stop].key+"'>"+stop_array[stop].value.getTitle()+"</option>");
+					}
+				});
+			});
+		}
+	});
+	$('#select-stop').prepend('<option value="" data-placeholder="true">Select Bus Stop</option>');
+	$("#select-stop").selectmenu("refresh");
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Function Graveyard -----------------------------------------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+function addMarkerListener(map,marker){
+	google.maps.event.addListener(marker, 'click', function() {
+        map.panTo(marker.getPosition());
+    });
+}
+
+function animateSymbol(polyline) {
+	var count = 0;
+	var step = 64;
+	window.setInterval(function() {
+		count = (count + 1) % (step*100);
+
+		var icons = polyline.get('icons');
+		icons[0].offset = (count / step) + '%';
+		polyline.set('icons', icons);
+	}, 20);
+}
+
+function markerDropListener(marker,path,map){
+	var shadow = new google.maps.Marker({
+		position : marker.getPosition(),
+		visible : false
+	  });
+	  
+	shadow.setMap(map);
+	  
+	google.maps.event.addListener(marker, "dragend", function(event) { 
+	  var lat = event.latLng.lat(); 
+	  var lng = event.latLng.lng();
+	  var latlng = new google.maps.LatLng(lat,lng);
+	  marker.setPosition(latlng);
+	  
+	  var res = closestPointOnPath(latlng,path);
+	  shadow.setPosition(res.coord);
+	  shadow.setVisible(true);
+	});
+}
+*/

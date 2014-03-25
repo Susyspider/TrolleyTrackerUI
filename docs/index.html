@@ -6,32 +6,10 @@
 		<link rel="stylesheet" href="../jquery-mobile/jquery.mobile.css" />
 		<link rel="stylesheet" href="../src/jquery.mobile.splitview.css" />
 		<link rel="stylesheet" href="jquery-ui-1.10.4/jquery-ui-1.10.4/jquery-1.10.2.js" />
+		<link rel="stylesheet" href="../jquery-mobile/custom.css" />
 		<!--link rel="stylesheet" href="themes/f.min.css" /-->
 		<!--link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" /-->
 		<!--link rel="stylesheet"  href="../src/jquery.mobile.grids.collapsible.css" /-->
-		<style>
-			#admin-buttons a {
-			  	padding: 10px;
-			  }
-			.odd {
-			  background-color : #EEEEEE;
-			  color : black;
-			  text-align : center;
-			  height : 30px;
-			  padding-top : 5px;
-			  font-weight: bold;
-			  font-size: 16px;
-			}
-			.even {
-			  background-color : #CCCCCC;
-			  color : black;
-			  text-align : center;
-			  height : 30px;
-			  padding-top : 5px;
-			  font-weight:bold;
-			  font-size: 16px;
-			}
-		</style>
 		<script type="text/javascript" src="../vendor/jquery-1.7.1.js"></script>
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
 		<script type="text/javascript" src="../src/jquery.mobile.splitview.js"></script>
@@ -53,209 +31,15 @@
 				};
 				
 				map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-				
-				// TROLLEY STOP MARKERS -------------------------------------------------------------------------------
-				var busstop = 'images/icons-simple/busstop.png';
-				
-				stop_array = [
-					{	key : "pala", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.205942,-67.136433),
-						title : "Palacio",
-						icon: busstop
-					})},
-					
-					{	key: "fisi", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.210868,-67.139643),
-						title : "Puente Fisica",
-						icon: busstop
-					})},
-				
-					{	key: "bibl", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.211787,-67.14196),
-						title : "Biblioteca",
-						icon: busstop
-					})},
-				
-					{ 	key: "pati", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.211283,-67.140823),
-						title : "Patio Central",
-						icon: busstop
-					})},
-				
-					{	key: "admi", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.216771,-67.143049),
-						title : "Administracion de Empresas",
-						icon: busstop
-					})},
-				
-					{	key: "civi", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.21458,-67.139772),
-						title : "Ingenieria Civil",
-						icon: busstop
-					})},
-				
-					{	key: "stef", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.20968,-67.139021),
-						title : "Stefani",
-						icon: busstop
-					})},
-				
-					{	key: "port", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.208957,-67.140322),
-						title : "Portico",
-						icon: busstop
-					})},
-				
-					{	key: "barc", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.207543,-67.139935),
-						title : "Barcelona",
-						icon: busstop
-					})},
-				
-					{	key: "deca", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.208648,-67.141432),
-						title : "Decanato de Estudiantes",
-						icon: busstop
-					})},
-				
-					{	key: "cent", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.209935,-67.141472),
-						title : "Centro de Estudiantes",
-						icon: busstop
-					})},
-				
-					{	key: "entr", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.211064,-67.144672),
-						title : "Entrada Principal",
-						icon: busstop
-					})},
-				
-					{	key: "darl", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.205683,-67.146185),
-						title : "Darlington",
-						icon: busstop
-					})},
-				
-					{	key: "gimn", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.212119,-67.143776),
-						title : "Gimnasio",
-						icon: busstop
-					})},
-				
-					{	key: "finc", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.215461,-67.146341),
-						title : "Finca Alzamora",
-						icon: busstop
-					})},
-				
-					{	key: "terr", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.215375,-67.14802),
-						title : "Parque Terrace",
-						icon: busstop
-					})},
-				
-					{	key: "pine", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.210638,-67.143591),
-						title : "Pinero",
-						icon: busstop
-					})},
-				
-					{	key: "atle", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.217306,-67.144844),
-						title : "Residencia de Atletas",
-						icon: busstop
-					})},
-				
-					{	key: "biol", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.211762,-67.138246),
-						title : "Biologia",
-						icon: busstop
-					})},
-				
-					{	key: "zool", value: new google.maps.Marker({
-						position : new google.maps.LatLng(18.215813,-67.133396),
-						title : "Zoologico",
-						icon: busstop
-					})}
-					];
-				
-				$.each(stop_array, function(stop) {
-					stop_array[stop].value.setMap(map);
-				});
-				
-				// ROUTE POLYLINES ------------------------------------------------------------------------------------
-				
-				route_array = [
-					{	key: "route1", title: "Palacio", 
-						stops: ["pala","barc","port","stef","pati"],
-						value:	new google.maps.Polyline({
-						path : Palacio,
-						strokeColor : '#FF0000',
-						strokeOpacity : 0.6,
-						strokeWeight : 10,
-						map : map
-					})},
-										
-				
-					{	key: "route2", title: "Zoologico",
-						stops: ["zool","biol","civi","bibl","fisi"],
-						value: new google.maps.Polyline({
-						visible : false,
-						path : Zoologico,
-						strokeColor : '#00FFFF',
-						strokeOpacity : 0.6,
-						strokeWeight : 10,
-						map : map
-					})},
-					
-					{	key: "route3", title: "Interno",
-						stops: ["atle","admi","bibl","fisi","cent","pine"],
-						value:	new google.maps.Polyline({
-						visible : false,
-						path : Interno,
-						strokeColor : '#FFFF00',
-						strokeOpacity : 0.6,
-						strokeWeight : 10,
-						map : map
-					})},
-					
-					{	key: "route4", title: "Terrace",
-						stops: ["terr","finc","admi","pati","fisi","cent"],
-						value:	new google.maps.Polyline({
-						visible : false,
-						path : Terrace,
-						strokeColor : '#FF00FF',
-						strokeOpacity : 0.6,
-						strokeWeight : 10,
-						map : map
-					})},
-										
-					{	key: "route5", title: "Darlington",
-						stops: ["darl","entr","gimn","bibl"],
-						value:	new google.maps.Polyline({
-						visible : false,
-						path : Darlington,
-						strokeColor : '#00FF00',
-						strokeOpacity : 0.6,
-						strokeWeight : 10,
-						map : map
-					})}
-					];
+
+				initStopMarkers();
+				initRoutes();
+				initSimulatorStuff();
+				initGeolocation();
 			}
 			google.maps.event.addDomListener(window, "load", initialize);
 
 		</script>
-		<style>
-			#content {
-				padding: 0;
-				position: absolute !important;
-				top: 40px !important;
-				right: 0;
-				bottom: 40px !important;
-				left: 0 !important;
-			}
-			
-		</style>
 
 		<body style="overflow: hidden;">
 
@@ -325,27 +109,9 @@
 										<label for="select-stop" class="ui-hidden-accessible"></label>
 										<select name="select-stop" id="select-stop">
 											<option value="0" data-placeholder="true">Select Bus Stop</option>
-											<!--option value="admi">Administracion de Empresas</option>
-											<option value="barc">Barcelona</option>
-											<option value="bibl">Biblioteca</option>
-											<option value="biol">Biologia</option>
-											<option value="cent">Centro de Estudiantes</option>
-											<option value="darl">Darlington</option>
-											<option value="deca">Decanato de Estudiantes</option>
-											<option value="entr">Entrada Principal</option>
-											<option value="finc">Finca Alzamora</option>
-											<option value="fisi">Fisica</option>
-											<option value="gimn">Gimnasio</option>
-											<option value="civi">Ingenieria Civil</option>
-											<option value="pala">Palacio</option>
-											<option value="terr">Parque Terrace</option>
-											<option value="pati">Patio Central</option>
-											<option value="pine">Pinero</option>
-											<option value="port">Portico</option>
-											<option value="atle">Residencia de Atletas</option>
-											<option value="stef">Stefani</option>
-											<option value="zool">Zoologico</option-->
 										</select>
+										<label for="follow-trolley">Follow Trolley</label> 	
+										<input type="checkbox" name="follow-trolley" id="follow-trolley" class="custom" value=true /> 
 										<br/>
 										<div id="calculate-eta" data-role="button" data-theme="e">Calculate</div>
 									</li>
