@@ -1,3 +1,7 @@
+//TODO: fix mobile view
+//TODO: test trolley movement simulator
+//TODO: consider alternatives to splitview? Maybe accordion-style options
+
 function getDistanceAcrossPath(slatlng,tlatlng,rpath){
 	var times1 = 0;
 	var times2 = 0;
@@ -222,6 +226,7 @@ $(document).on('click', "#reset-map-view", function() {
   	map.setZoom(17);
 });
 
+//TODO: stop animations on all markers
 $(document).on('click', "#eta-clear", function() {
 	$( "#eta-stop" ).empty();
 	$( "#eta-route" ).empty();
@@ -236,9 +241,29 @@ $(document).on('click', "#eta-clear", function() {
 	$('#eta-bar').css({
 		'height': '6px',
 	});
-	//bring route select and stop select to default
 });
 
+$(document).on('change', "#select-route", function() {
+	var the_route = $('#select-route').val();
+	var the_stops;
+	$('#select-stop').empty();
+	$.each(route_array, function(route) {
+		if(route_array[route].key === the_route){
+			the_stops = route_array[route].stops;
+			$.each(stop_array, function(stop) {
+				$.each(the_stops, function(the_stop) {
+					if(stop_array[stop].key == the_stops[the_stop]){
+						$('#select-stop').append("<option value='"+stop_array[stop].key+"'>"+stop_array[stop].value.getTitle()+"</option>");
+					}
+				});
+			});
+		}
+	});
+	$('#select-stop').prepend('<option value="" data-placeholder="true">Select Bus Stop</option>');
+	$("#select-stop").selectmenu("refresh");
+});
+
+//TODO: set timeout for marker animation
 $(document).on('click', "#calculate-eta", function() {
 	var the_stop = $('#select-stop').val();
 	var the_route = $('#select-route').val();

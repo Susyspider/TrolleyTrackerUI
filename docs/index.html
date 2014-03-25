@@ -186,49 +186,59 @@
 				// ROUTE POLYLINES ------------------------------------------------------------------------------------
 				
 				route_array = [
-					{	key: "route1", title: "Palacio", value:	new google.maps.Polyline({
-												path : Palacio,
-												strokeColor : '#FF0000',
-												strokeOpacity : 0.6,
-												strokeWeight : 10,
-												map : map
+					{	key: "route1", title: "Palacio", 
+						stops: ["pala","barc","port","stef","pati"],
+						value:	new google.maps.Polyline({
+						path : Palacio,
+						strokeColor : '#FF0000',
+						strokeOpacity : 0.6,
+						strokeWeight : 10,
+						map : map
 					})},
 										
 				
-					{	key: "route2", title: "Zoologico", value: new google.maps.Polyline({
-												visible : false,
-												path : Zoologico,
-												strokeColor : '#00FFFF',
-												strokeOpacity : 0.6,
-												strokeWeight : 10,
-												map : map
+					{	key: "route2", title: "Zoologico",
+						stops: ["zool","biol","civi","bibl","fisi"],
+						value: new google.maps.Polyline({
+						visible : false,
+						path : Zoologico,
+						strokeColor : '#00FFFF',
+						strokeOpacity : 0.6,
+						strokeWeight : 10,
+						map : map
 					})},
 					
-					{	key: "route3", title: "Interno", value:	new google.maps.Polyline({
-												visible : false,
-												path : Interno,
-												strokeColor : '#FFFF00',
-												strokeOpacity : 0.6,
-												strokeWeight : 10,
-												map : map
+					{	key: "route3", title: "Interno",
+						stops: ["atle","admi","bibl","fisi","cent","pine"],
+						value:	new google.maps.Polyline({
+						visible : false,
+						path : Interno,
+						strokeColor : '#FFFF00',
+						strokeOpacity : 0.6,
+						strokeWeight : 10,
+						map : map
 					})},
 					
-					{	key: "route4", title: "Terrace", value:	new google.maps.Polyline({
-												visible : false,
-												path : Terrace,
-												strokeColor : '#FF00FF',
-												strokeOpacity : 0.6,
-												strokeWeight : 10,
-												map : map
+					{	key: "route4", title: "Terrace",
+						stops: ["terr","finc","admi","pati","fisi","cent"],
+						value:	new google.maps.Polyline({
+						visible : false,
+						path : Terrace,
+						strokeColor : '#FF00FF',
+						strokeOpacity : 0.6,
+						strokeWeight : 10,
+						map : map
 					})},
 										
-					{	key: "route5", title: "Darlington", value:	new google.maps.Polyline({
-												visible : false,
-												path : Darlington,
-												strokeColor : '#00FF00',
-												strokeOpacity : 0.6,
-												strokeWeight : 10,
-												map : map
+					{	key: "route5", title: "Darlington",
+						stops: ["darl","entr","gimn","bibl"],
+						value:	new google.maps.Polyline({
+						visible : false,
+						path : Darlington,
+						strokeColor : '#00FF00',
+						strokeOpacity : 0.6,
+						strokeWeight : 10,
+						map : map
 					})}
 					];
 			}
@@ -303,10 +313,19 @@
 								Bus Arrival Times
 								<ul data-theme="a">
 									<li>
+										<label for="select-route" class="ui-hidden-accessible">Select Route</label>
+										<select name="select-route" id="select-route">
+											<option value="" data-placeholder="true">Select Route</option>
+											<option value="route1">Palacio</option>
+											<option value="route2">Zoologico</option>
+											<option value="route3">Interno</option>
+											<option value="route4">Terrace</option>
+											<option value="route5">Darlington</option>
+										</select>
 										<label for="select-stop" class="ui-hidden-accessible"></label>
 										<select name="select-stop" id="select-stop">
-											<option value="" data-placeholder="true">Select Bus Stop</option>
-											<option value="admi">Administracion de Empresas</option>
+											<option value="0" data-placeholder="true">Select Bus Stop</option>
+											<!--option value="admi">Administracion de Empresas</option>
 											<option value="barc">Barcelona</option>
 											<option value="bibl">Biblioteca</option>
 											<option value="biol">Biologia</option>
@@ -323,18 +342,9 @@
 											<option value="pati">Patio Central</option>
 											<option value="pine">Pinero</option>
 											<option value="port">Portico</option>
-											<option value="atle">Residencia de Atletas</option><!--registrador-->
+											<option value="atle">Residencia de Atletas</option>
 											<option value="stef">Stefani</option>
-											<option value="zool">Zoologico</option>
-										</select>
-										<label for="select-route" class="ui-hidden-accessible">Select Route</label>
-										<select name="select-route" id="select-route">
-											<option value="" data-placeholder="true">Select Route</option>
-											<option value="route1">Palacio</option>
-											<option value="route2">Zoologico</option>
-											<option value="route3">Interno</option>
-											<option value="route4">Terrace</option>
-											<option value="route5">Darlington</option>
+											<option value="zool">Zoologico</option-->
 										</select>
 										<br/>
 										<div id="calculate-eta" data-role="button" data-theme="e">Calculate</div>
@@ -470,7 +480,9 @@
 				<div data-role="page" id="aboutsv">
 
 					<div data-role="header">
+						<a href="#menu" data-role="button" data-icon="grid" data-mini="true" data-inline="true">Menu</a>
 						<h1>UPRM TrolleyTracker</h1>
+						<a href="#show-info" data-role="button" data-icon="info" data-mini="true" data-inline="true">Info</a>
 					</div><!-- /header -->
 
 					<div data-role="popup" id="api-popup" data-theme="a" style="width:350px;">
